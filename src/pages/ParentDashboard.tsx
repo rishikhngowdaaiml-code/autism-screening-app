@@ -11,13 +11,33 @@ export default function ParentDashboard() {
   const nav = useNavigate();
   const user = storage.currentUser();
   const phone = user?.phone || "anon";
+
   const [children, setChildren] = useState<Child[]>([]);
   const [name, setName] = useState("");
   const [age, setAge] = useState<number | "">("");
+  const [expandedChildId, setExpandedChildId] = useState<string | null>(null);
+  const [reports, setReports] = useState<
+    { id: string; childId: string; date: string; risk: number }[]
+  >([]);
 
   useEffect(() => {
-    setChildren(storage.getChildren(phone));
-  }, []);
+    // load children and reports for this parent
+    const ch = storage.getChildren(phone);
+    setChildren(ch);
+
+    const rs = storage.getReports(phone);
+    // map minimal fields we need
+    const mapped = rs.map((r) => ({ id: r.id, childId: r.childId, date: r.date, risk: r.risk }));
+    setReports(mapped);
+
+    // debug helpers - if nothing loaded, print keys to help troubleshoot
+    if (!user?.phone) {
+      // If user has no phone, parent likely logged in with clinician role or user not set
+      console.warn("[ParentDashboard] No phone found on current user; using 'anon'.");
+    } else if (ch.length === 0 && rs.length > 0) {
+      console.warn(`[ParentDashboard] Found reports (${rs.length}) but no children under phone ${phone}.`);
+    }
+  }, [phone]); // run when phone changes
 
   function addChild(e: React.FormEvent) {
     e.preventDefault();
@@ -34,9 +54,18 @@ export default function ParentDashboard() {
     nav(`/assessment/${id}`);
   }
 
+  function toggleReports(id: string) {
+    setExpandedChildId((s) => (s === id ? null : id));
+  }
+
+  function reportsFor(childId: string) {
+    return reports.filter((r) => r.childId === childId);
+  }
+
   return (
     <div>
       <h3>{t("dashboard.title")}</h3>
+
       <div className="card" style={{ marginBottom: 12 }}>
         <form className="form" onSubmit={addChild}>
           <label>{t("dashboard.name")}</label>
@@ -53,7 +82,14 @@ export default function ParentDashboard() {
         ) : (
           <div className="child-grid">
             {children.map((c) => (
-              <ChildCard key={c.id} child={c} onStart={start} />
+              <ChildCard
+                key={c.id}
+                child={c}
+                onStart={start}
+                onToggleReports={toggleReports}
+                expanded={expandedChildId === c.id}
+                reportsForChild={reportsFor(c.id)}
+              />
             ))}
           </div>
         )}
