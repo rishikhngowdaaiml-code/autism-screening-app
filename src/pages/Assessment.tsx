@@ -7,37 +7,56 @@ import { storage } from "../services/storage";
 import { v4 as uuidv4 } from "uuid";
 import type { Report } from "../types";
 
-const QUESTIONS = [
-  "Has difficulty with back-and-forth conversations.",
-  "Repeats phrases or words often.",
-  "Avoids eye contact.",
-  "Has limited interest in peers.",
-  "Shows repetitive behaviors.",
-  "Unusual reactions to sensory input.",
-  "Delayed speech development.",
-  "Difficulty understanding nonverbal cues.",
-  "Limited imaginative play.",
-  "Has intense interests or obsessions."
-];
-
 export default function Assessment() {
   const { t } = useTranslation();
   const { childId } = useParams();
   const nav = useNavigate();
   const user = storage.currentUser();
   const phone = user?.phone || "anon";
+
+  // load questions and options from translations so they update when language changes
+  const QUESTIONS = (t("assessment.questions", { returnObjects: true }) as string[]) || [
+    // fallback in case translation missing
+    "Has difficulty with back-and-forth conversations.",
+    "Repeats phrases or words often.",
+    "Avoids eye contact.",
+    "Has limited interest in peers.",
+    "Shows repetitive behaviors.",
+    "Unusual reactions to sensory input.",
+    "Delayed speech development.",
+    "Difficulty understanding nonverbal cues.",
+    "Limited imaginative play.",
+    "Has intense interests or obsessions."
+  ];
+
+  const OPTIONS = (t("assessment.options", { returnObjects: true }) as string[]) || [
+    "Never",
+    "Rarely",
+    "Sometimes",
+    "Often",
+    "Always"
+  ];
+
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<number[]>(Array(QUESTIONS.length).fill(-1));
 
   useEffect(()=> {
+    // ensure child exists
     const children = storage.getChildren(phone);
     if (!children.find(c=>c.id===childId)) {
-      // fallback - go back
+      // fallback - optionally navigate back or show a message
     }
-  },[]);
+
+    // If QUESTIONS length changes (due to language change), ensure answers array matches length
+    setAnswers((prev) => {
+      if (prev.length === QUESTIONS.length) return prev;
+      const next = Array(QUESTIONS.length).fill(-1);
+      for (let i = 0; i < Math.min(prev.length, next.length); i++) next[i] = prev[i];
+      return next;
+    });
+  }, [childId, phone, QUESTIONS.length]);
 
   const currentQ = QUESTIONS[index];
-  const options = useMemo(() => ["Never","Rarely","Sometimes","Often","Always"], []);
 
   function choose(i: number) {
     const next = [...answers];
@@ -47,7 +66,7 @@ export default function Assessment() {
 
   function submit() {
     if (answers.some(a => a < 0)) {
-      alert("Please answer all questions.");
+      alert(t("assessment.pleaseAnswerAll", "Please answer all questions."));
       return;
     }
     const models = simulateModels(answers);
@@ -63,6 +82,7 @@ export default function Assessment() {
     const next = [report, ...reports];
     storage.saveReports(phone, next);
 
+    // attach to child
     const children = storage.getChildren(phone).map(c => {
       if (c.id === childId) {
         c.reports = c.reports ? [report.id, ...c.reports] : [report.id];
@@ -83,7 +103,7 @@ export default function Assessment() {
           <p>{currentQ}</p>
 
           <div style={{ display: "flex", gap: 8 }}>
-            {options.map((opt, i) => {
+            {OPTIONS.map((opt, i) => {
               const selected = answers[index] === i;
               return (
                 <button

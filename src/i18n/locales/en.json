@@ -25,10 +25,24 @@
   },
   "assessment": {
     "title": "10-Question Screening",
+    "questions": [
+      "Has difficulty with back-and-forth conversations.",
+      "Repeats phrases or words often.",
+      "Avoids eye contact.",
+      "Has limited interest in peers.",
+      "Shows repetitive behaviors.",
+      "Unusual reactions to sensory input.",
+      "Delayed speech development.",
+      "Difficulty understanding nonverbal cues.",
+      "Limited imaginative play.",
+      "Has intense interests or obsessions."
+    ],
+    "options": ["Never", "Rarely", "Sometimes", "Often", "Always"],
     "question": "Question {{index}} of {{total}}",
     "next": "Next",
     "prev": "Previous",
-    "submit": "Submit"
+    "submit": "Submit",
+    "pleaseAnswerAll": "Please answer all questions."
   },
   "results": {
     "risk": "Risk Percentage",
