@@ -1,0 +1,47 @@
+{
+  "appName": "Autism Screening",
+  "welcome": {
+    "title": "Early Autism Screening, Multilingual",
+    "subtitle": "Professional, evidence-based screening for parents and clinicians.",
+    "start": "Get started",
+    "login": "Login"
+  },
+  "auth": {
+    "role": "Role",
+    "parent": "Parent",
+    "clinician": "Clinician",
+    "phone": "Phone number",
+    "email": "Email",
+    "password": "Password",
+    "loginBtn": "Sign in"
+  },
+  "dashboard": {
+    "title": "Parent Dashboard",
+    "addChild": "Add Child",
+    "name": "Name",
+    "age": "Age",
+    "startAssessment": "Start Assessment",
+    "noChildren": "No children yet. Add a child to begin."
+  },
+  "assessment": {
+    "title": "10-Question Screening",
+    "question": "Question {{index}} of {{total}}",
+    "next": "Next",
+    "prev": "Previous",
+    "submit": "Submit"
+  },
+  "results": {
+    "risk": "Risk Percentage",
+    "low": "Low Risk",
+    "moderate": "Moderate Risk",
+    "high": "High Risk",
+    "recommendations": "Recommendations",
+    "print": "Print",
+    "share": "Share"
+  },
+  "recommendations": {
+    "low": ["Speech enrichment", "Social activities", "Parent training", "Preschool programs"],
+    "moderate": ["Early intervention services", "Therapy", "Visual supports", "Developmental support"],
+    "high": ["ABA therapy", "Intensive interventions", "Special education services", "Monthly monitoring"]
+  }
+}
